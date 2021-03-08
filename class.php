@@ -1,21 +1,37 @@
 <?php
 require_once 'login.php';
-$conn = new mysqli($hn,$db,$un,$pw);
-if($conn->connect_error) die($conn->connect_error);
+
+$conn = mysqli_connect($hn,$un,$pw,$db);
+if(!$conn)
+    die(mysqli_connect_error());
 
 $query = "SELECT * FROM classics";
-$result = $conn->query($query);
-if(!$result) die($conn->error);
-$rows = $result ->num_rows;
-for($j = 0;$j < $rows;++$j){
-    $result ->data_seek($j);
-    $row = $result->fetch_array(MYSQLI_ASSOC);
-    echo 'id: '.$row['id']."<br>";
-    echo 'name: '.$row['name']."<br>";
-    echo 'age: '.$row['age']."<br>";
-    echo 'address: '.$row['adress']."<br>";
-    echo 'telephone: '.$row['telephone']."<br>";
-
+$result = mysqli_query($conn,$query);
+if(mysqli_num_rows($result)>0){
+    echo "<table>
+        <thead>
+        <tr>
+        <th>ID</th>
+        <th>Name</th>
+        <th>Age</th>
+        <th>Address</th>
+        <th>Telephone</th>
+        </tr>
+        </thead>";
+    while($row=mysqli_fetch_assoc($result)){
+        echo "<tr>
+               <td>".$row['id']."</td>
+               <td>".$row['name']."</td>
+               <td>".$row['age']."</td>
+               <td>".$row['address']."</td>
+               <td>".$row['telephone']."</td>
+               </tr>";
+    }
+    echo "</table>";
 }
-$result->close();
-$conn->close();
+else
+    echo "No record found";
+
+require_once 'add.php';
+mysqli_close($conn);
+?>
